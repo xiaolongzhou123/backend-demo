@@ -7,9 +7,11 @@ require github.com/spf13/cobra v1.6.1
 require (
 	github.com/bytedance/sonic v1.8.0 // indirect
 	github.com/chenzhuoyu/base64x v0.0.0-20221115062448-fe3a3abad311 // indirect
+	github.com/dgrijalva/jwt-go v3.2.0+incompatible // indirect
 	github.com/fsnotify/fsnotify v1.6.0 // indirect
 	github.com/gin-contrib/sse v0.1.0 // indirect
 	github.com/gin-gonic/gin v1.9.0 // indirect
+	github.com/go-ldap/ldap v3.0.3+incompatible // indirect
 	github.com/go-playground/locales v0.14.1 // indirect
 	github.com/go-playground/universal-translator v0.18.1 // indirect
 	github.com/go-playground/validator/v10 v10.11.2 // indirect
@@ -40,6 +42,7 @@ require (
 	golang.org/x/sys v0.5.0 // indirect
 	golang.org/x/text v0.7.0 // indirect
 	google.golang.org/protobuf v1.28.1 // indirect
+	gopkg.in/asn1-ber.v1 v1.0.0-20181015200546-f715ec2f112d // indirect
 	gopkg.in/ini.v1 v1.67.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )

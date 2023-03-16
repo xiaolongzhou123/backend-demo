@@ -1,2 +1,16 @@
-PORT: 8080
-DEBUG: true
+Port: 8080
+Debug: true
+Jwt_Exp: 30  #,签发超时时间，分为单位
+Jwt_Secret: "this1is2secret"
+
+Admin:
+    Names: ["zxl"]
+
+Ldap:
+  Host: 18.18.2.2:389
+  BaseDN: dc=example,dc=org
+  BindDN: cn=admin,dc=example,dc=org
+  BinPass: admin
+  LdapAttr: [ 'uid','sn','mail']  #ldap中有多个字段，只返回这几个字段回来，字段添加越多，返回越多
+  UserDN:
+    signup: ou=sigin

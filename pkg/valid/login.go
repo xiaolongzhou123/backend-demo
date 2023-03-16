@@ -1,22 +1,30 @@
 package valid
 
 import (
-	"fmt"
-
 	"github.com/go-playground/validator/v10"
 )
 
 var Passcheck validator.Func = func(fl validator.FieldLevel) bool {
-	fmt.Println("pass+++++++++++++++++++++++++++++++++++++}")
-	data, ok := fl.Field().Interface().(string)
-	fmt.Println("=================================Passcheck validator.Func:", data, ok)
-	return true
+	if data, ok := fl.Field().Interface().(string); ok {
+		length := len(data)
+		if length > 16 || length < 8 {
+			return false
+		}
+		return true
+	}
+	return false
 }
 var Usercheck validator.Func = func(fl validator.FieldLevel) bool {
-	fmt.Println("user+++++++++++++++++++++++++++++++++++++}")
-	data, ok := fl.Field().Interface().(string)
-	fmt.Println("=================================Passcheck validator.Func:", data, ok)
-	return true
+	if data, ok := fl.Field().Interface().(string); ok {
+
+		length := len(data)
+		if length < 2 {
+			return false
+		}
+
+		return true
+	}
+	return false
 }
 
 func Test() {
