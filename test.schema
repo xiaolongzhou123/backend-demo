@@ -1,0 +1,141 @@
+attributetype (
+    3.2.2.1.1
+    NAME 'myId'
+    DESC '测试id'
+        SYNTAX 1.3.6.1.4.1.1466.115.121.1.15
+    EQUALITY caseIgnoreMatch
+    SUBSTR caseIgnoreSubstringsMatch
+    SINGLE-VALUE )
+attributetype (
+    3.2.2.1.2
+    NAME 'myName'
+    DESC '花名'
+        SYNTAX 1.3.6.1.4.1.1466.115.121.1.15
+    EQUALITY caseIgnoreMatch
+    SUBSTR caseIgnoreSubstringsMatch
+    SINGLE-VALUE )
+
+attributetype (
+    3.2.2.1.3
+    NAME 'myuserid'
+    DESC '员工id号'
+	SYNTAX 1.3.6.1.4.1.1466.115.121.1.15
+    EQUALITY caseIgnoreMatch
+    SUBSTR caseIgnoreSubstringsMatch
+    SINGLE-VALUE )
+attributetype (
+    3.2.2.1.4
+    NAME 'mycnname'
+    DESC '中文名'
+	SYNTAX 1.3.6.1.4.1.1466.115.121.1.15
+    EQUALITY caseIgnoreMatch
+    SUBSTR caseIgnoreSubstringsMatch
+    SINGLE-VALUE )
+
+attributetype (
+    3.2.2.1.5
+    NAME 'mytitle'
+    DESC '我测试的名称'
+	SYNTAX 1.3.6.1.4.1.1466.115.121.1.15
+    EQUALITY caseIgnoreMatch
+    SUBSTR caseIgnoreSubstringsMatch
+    SINGLE-VALUE )
+
+
+attributetype (
+    3.2.2.1.6
+    NAME 'myposition'
+    DESC '我是干啥的'
+	SYNTAX 1.3.6.1.4.1.1466.115.121.1.15
+    EQUALITY caseIgnoreMatch
+    SUBSTR caseIgnoreSubstringsMatch
+    SINGLE-VALUE )
+
+attributetype (
+    3.2.2.1.7
+    NAME 'mydepartmentid'
+    DESC '部门id'
+	SYNTAX 1.3.6.1.4.1.1466.115.121.1.15
+    EQUALITY caseIgnoreMatch
+    SUBSTR caseIgnoreSubstringsMatch
+    SINGLE-VALUE )
+
+attributetype (
+    3.2.2.1.8
+    NAME 'mydepartment'
+    DESC '所在部门'
+	SYNTAX 1.3.6.1.4.1.1466.115.121.1.15
+    EQUALITY caseIgnoreMatch
+    SUBSTR caseIgnoreSubstringsMatch
+    SINGLE-VALUE )
+
+attributetype (
+    3.2.2.1.9
+    NAME 'myseat'
+    DESC '座位号'
+	SYNTAX 1.3.6.1.4.1.1466.115.121.1.15
+    EQUALITY caseIgnoreMatch
+    SUBSTR caseIgnoreSubstringsMatch
+    SINGLE-VALUE )
+
+
+attributetype (
+    3.2.2.1.10
+    NAME 'myreg'
+    DESC '入职时间'
+	SYNTAX 1.3.6.1.4.1.1466.115.121.1.15
+    EQUALITY caseIgnoreMatch
+    SUBSTR caseIgnoreSubstringsMatch
+    SINGLE-VALUE )
+
+attributetype (
+    3.2.2.1.11
+    NAME 'mygroup'
+    DESC '所在集团'
+	SYNTAX 1.3.6.1.4.1.1466.115.121.1.15
+    EQUALITY caseIgnoreMatch
+    SUBSTR caseIgnoreSubstringsMatch
+    SINGLE-VALUE )
+
+attributetype (
+    3.2.2.1.12
+    NAME 'myleave'
+    DESC '离职时间'
+	SYNTAX 1.3.6.1.4.1.1466.115.121.1.15
+    EQUALITY caseIgnoreMatch
+    SUBSTR caseIgnoreSubstringsMatch
+    SINGLE-VALUE )
+
+
+attributetype (
+    3.2.2.1.13
+    NAME 'mytel'
+    DESC '座机号电话'
+	SYNTAX 1.3.6.1.4.1.1466.115.121.1.15
+    EQUALITY caseIgnoreMatch
+    SUBSTR caseIgnoreSubstringsMatch
+    SINGLE-VALUE )
+
+attributetype (
+    3.2.2.1.14
+    NAME 'myleader'
+    DESC '直属上级'
+	SYNTAX 1.3.6.1.4.1.1466.115.121.1.15
+    EQUALITY caseIgnoreMatch
+    SUBSTR caseIgnoreSubstringsMatch
+    SINGLE-VALUE )
+
+
+
+objectClass (
+    4.4.2.1.8
+    NAME 'myObjectClass'
+	DESC '我测试的objectClass'
+    SUP inetOrgPerson STRUCTURAL
+    MAY ( myId $ myName
+		$ myuserid $ mycnname $ mytitle
+		$ myposition $ mydepartmentid
+		$ mydepartment $ myseat $ myreg
+		$ mygroup $ myleave $ mytel
+		$ myleader
+    ))

@@ -3,26 +3,17 @@ package http
 import (
 	"fmt"
 	"sso/cmd/http/admins"
+	"sso/cmd/http/login"
 	"sso/cmd/http/middleware"
 	"sso/pkg"
-	"sso/pkg/valid"
 
 	"github.com/gin-gonic/gin"
-	"github.com/gin-gonic/gin/binding"
-	"github.com/go-playground/validator/v10"
 )
 
-func Start() {
+func RegisterRouter(r *gin.Engine) {
 	conf := pkg.Conf()
-	r := gin.Default()
-
-	if v, ok := binding.Validator.Engine().(*validator.Validate); ok {
-		v.RegisterValidation("passcheck", valid.Passcheck)
-		v.RegisterValidation("usercheck", valid.Usercheck)
-	}
-
 	//未登陆相关的api
-	r.POST("/login", Login)
+	r.POST("/login", login.Login)
 
 	//登陆之后的api，都是认证过的
 	r.Use(middleware.IsLogin())
