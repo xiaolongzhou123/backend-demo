@@ -3,8 +3,8 @@ package http
 import (
 	"fmt"
 	"sso/cmd/http/admins"
-	"sso/cmd/http/login"
 	"sso/cmd/http/middleware"
+	"sso/cmd/http/noauth"
 	"sso/pkg"
 
 	"github.com/gin-gonic/gin"
@@ -13,11 +13,12 @@ import (
 func RegisterRouter(r *gin.Engine) {
 	conf := pkg.Conf()
 	//未登陆相关的api
-	r.POST("/login", login.Login)
+	r.POST("/login", noauth.Login)
 
 	//登陆之后的api，都是认证过的
 	r.Use(middleware.IsLogin())
-	r.GET("/user", GetUser) //返回当前用户信息
+	r.GET("/user", GetUser)            //返回当前用户信息
+	r.POST("/changepwd", ChangePasswd) //返回当前用户信息
 
 	//管理员相关api
 	r.Use(middleware.IsAdmin())

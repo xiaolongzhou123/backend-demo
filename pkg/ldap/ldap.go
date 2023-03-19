@@ -3,6 +3,7 @@ package ldap
 import (
 	"errors"
 	"fmt"
+	"log"
 	"sso/pkg"
 	"strings"
 
@@ -130,7 +131,10 @@ func GetResult(sr *ldap.SearchResult) []*List {
 	}
 	return arrList
 }
-func (l *LdapClient) GetUserNameCN(name, searchdn string) (string, error) {
+func (l *LdapClient) GetUserNameCN(name string) (string, error) {
+
+	conf := pkg.Conf()
+	searchdn := fmt.Sprintf("%s,%s", conf.Ldap.UserDN["signup"], conf.Ldap.BaseDN)
 	req := ldap.NewSearchRequest(searchdn,
 		ldap.ScopeWholeSubtree,
 		ldap.NeverDerefAliases,
@@ -151,19 +155,73 @@ func (l *LdapClient) GetUserNameCN(name, searchdn string) (string, error) {
 	}
 	return entry.DN, nil
 }
-func (this *LdapClient) Login(user, pass string) error {
+
+func (this *LdapClient) LoginV1(userdn, pass string) error {
 	// config := g.Config()
+	err := this.Conn.Bind(userdn, strings.TrimSpace(pass))
+	return err
+}
+
+func (this *LdapClient) Login(user, pass string) (error, string) {
 	conf := pkg.Conf()
 	searchdn := fmt.Sprintf("%s,%s", conf.Ldap.UserDN["signup"], conf.Ldap.BaseDN)
-	fmt.Println(searchdn)
-	dn, err := this.GetUserNameCN(user, searchdn)
+	//主要为了查询userdn,cn=abc,cn=dev,ou=tech,dc=example,dc=org
+	req := ldap.NewSearchRequest(searchdn,
+		ldap.ScopeWholeSubtree,
+		ldap.NeverDerefAliases,
+		0, 0, false,
+		fmt.Sprintf("(&(cn=%s))", user), // The filter to apply
+		[]string{"entryDN"}, nil)
+
+	res, err := this.Conn.Search(req)
 	if err != nil {
-		fmt.Println(err)
+		return err, ""
+	}
+	if len(res.Entries) == 0 {
+		return fmt.Errorf("用户不存在"), ""
+	}
+	userdn := res.Entries[0].DN
+	fmt.Println("====", userdn)
+
+	// userdn := "cn=abc,cn=dev,ou=tech,dc=example,dc=org"
+
+	controls := []ldap.Control{}
+	controls = append(controls, ldap.NewControlBeheraPasswordPolicy())
+	bindRequest := ldap.NewSimpleBindRequest(userdn, pass, controls)
+
+	r, err := this.Conn.SimpleBind(bindRequest)
+	ppolicyControl := ldap.FindControl(r.Controls, ldap.ControlTypeBeheraPasswordPolicy)
+
+	var ppolicy *ldap.ControlBeheraPasswordPolicy
+	if ppolicyControl != nil {
+		ppolicy = ppolicyControl.(*ldap.ControlBeheraPasswordPolicy)
+	} else {
+		log.Printf("ppolicyControl response not avaliable.\n")
+	}
+	if err != nil {
+		errStr := "ERROR: Cannot bind: " + err.Error()
+		if ppolicy != nil && ppolicy.Error >= 0 {
+			errStr += ":" + ppolicy.ErrorString
+		}
+		return err, errStr
+	} else {
+		logStr := "Login Ok"
+		if ppolicy != nil {
+			if ppolicy.Expire >= 0 {
+				logStr += fmt.Sprintf(". Password expires in %d seconds\n", ppolicy.Expire)
+			} else if ppolicy.Grace >= 0 {
+				logStr += fmt.Sprintf(". Password expired, %d grace logins remain\n", ppolicy.Grace)
+			}
+		}
+		return nil, logStr
+	}
+	return errors.New("unknow error"), ""
+}
+func (l *LdapClient) ChangePasswd(dn, old_pass, cur_pass string) error {
+	pmr := ldap.NewPasswordModifyRequest(dn, old_pass, cur_pass)
+	_, err := l.Conn.PasswordModify(pmr)
+	if err != nil {
 		return err
 	}
-	if dn == "" {
-		return errors.New("user isn't exist.")
-	}
-	err = this.Conn.Bind(dn, strings.TrimSpace(pass))
-	return err
+	return nil
 }
