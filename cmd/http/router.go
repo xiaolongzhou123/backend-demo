@@ -14,6 +14,7 @@ func RegisterRouter(r *gin.Engine) {
 	conf := pkg.Conf()
 	//未登陆相关的api
 	r.POST("/login", noauth.Login)
+	r.GET("/refresh_token", middleware.IsRefresh(), noauth.Refresh_Token)
 
 	//登陆之后的api，都是认证过的
 	r.Use(middleware.IsLogin())

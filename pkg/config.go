@@ -25,6 +25,7 @@ type Config struct {
 	Debug     bool   `mapstructure:"Debug" `
 	Port      int64  `mapstructure:"Port"`
 	JwtExp    int64  `mapstructure:"Jwt_Exp"`
+	JwtRef    int64  `mapstructure:"Jwt_Ref"`
 	JwtSecret string `mapstructure:"Jwt_Secret"`
 }
 

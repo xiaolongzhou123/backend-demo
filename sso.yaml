@@ -1,6 +1,7 @@
 Port: 8080
 Debug: true
-Jwt_Exp: 60  #,签发超时时间，分为单位
+Jwt_Exp: 60    #,签发超时时间，分为单位
+Jwt_Ref: 43200  #,签发超时时间，分为单位
 Jwt_Secret: "this1is2secret"
 
 Admin:
