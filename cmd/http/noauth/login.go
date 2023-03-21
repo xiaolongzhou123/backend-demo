@@ -2,8 +2,10 @@ package noauth
 
 import (
 	"fmt"
+	"sso/pkg"
 	"sso/pkg/jwt"
 	"strconv"
+	"time"
 
 	"sso/pkg/ldap"
 	"sso/pkg/typing"
@@ -15,14 +17,35 @@ import (
 )
 
 func Refresh_Token(c *gin.Context) {
+	conf := pkg.Conf()
 	useri, _ := c.Get("user")
+	tokeni, _ := c.Get("token")
+	authtoken, _ := tokeni.(string)
 
 	claims, _ := useri.(*jwt.Claims)
 	token, refresh := jwt.CreateToken(claims.Uid, claims.User, claims.CN, claims.Mail)
 
+	status := false
+
+	tm1 := time.Unix(claims.ExpiresAt, 0)
+	tm2 := time.Now()
+	//是tm1减tm2，因为tm1是签发过期时间，一般根据配置为配置15天
+	if tm1.Unix()-tm2.Unix() < conf.JwtDiff {
+		status = true
+	}
+	fmt.Println("status:=", status)
+	fmt.Println("claims.ExpiresAt:=", tm1.Format("2006-01-02 15:04:05"))
+	fmt.Println("tm2=", tm2.Format("2006-01-02 15:04:05"))
+	fmt.Println("tm2-tm1=", tm1.Unix()-tm2.Unix())
+	fmt.Println("diff=", conf.JwtDiff)
+
 	rs := make(map[string]string, 0)
 	rs["access_token"] = fmt.Sprintf("%s %s", "Bearer", token)
-	rs["refresh_token"] = fmt.Sprintf("%s %s", "Bearer", refresh)
+	if status {
+		rs["refresh_token"] = fmt.Sprintf("%s %s", "Bearer", refresh)
+	} else {
+		rs["refresh_token"] = authtoken
+	}
 	c.JSON(200, typing.NewResp(200, "刷新token成功", rs))
 }
 func Login(c *gin.Context) {

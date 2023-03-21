@@ -26,6 +26,7 @@ type Config struct {
 	Port      int64  `mapstructure:"Port"`
 	JwtExp    int64  `mapstructure:"Jwt_Exp"`
 	JwtRef    int64  `mapstructure:"Jwt_Ref"`
+	JwtDiff   int64  `mapstructure:"Jwt_Diff"`
 	JwtSecret string `mapstructure:"Jwt_Secret"`
 }
 

@@ -3,6 +3,7 @@ Debug: true
 Jwt_Exp: 60    #,签发超时时间，分为单位
 Jwt_Ref: 43200  #,签发超时时间，分为单位
 Jwt_Secret: "this1is2secret"
+Jwt_Diff: 604800 #60*60*24*7,7天内用户有访问。refresh_token就会刷新，保证用户token可用
 
 Admin:
     Names: ["zxl"]
