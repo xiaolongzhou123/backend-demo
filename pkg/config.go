@@ -13,6 +13,9 @@ type Config struct {
 	Admin     struct {
 		Names []string `yaml:"Names"`
 	}
+	Pms struct {
+		Url string `yaml:"url"`
+	}
 	Ldap struct {
 		Host     string            `yaml:"Host"`
 		BaseDN   string            `yaml:"BaseDN"`

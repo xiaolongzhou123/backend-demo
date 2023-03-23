@@ -1,9 +1,9 @@
 package middleware
 
 import (
-	"sso/pkg"
 	"sso/pkg/jwt"
 	"sso/pkg/typing"
+	"sso/pkg/utils"
 
 	"github.com/gin-gonic/gin"
 )
@@ -20,15 +20,7 @@ func IsAdmin() func(c *gin.Context) {
 
 		if user, exist := c.Get("user"); exist {
 			u, _ := user.(*jwt.Claims)
-
-			names := pkg.Conf().Admin.Names
-			ok := false
-			for _, name := range names {
-				if name == u.User {
-					ok = true
-					break
-				}
-			}
+			ok := utils.IsAdmin(u.User)
 			if !ok {
 				NotAdmin(u.User+":非管理员", c)
 				return

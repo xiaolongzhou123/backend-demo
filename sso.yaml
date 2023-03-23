@@ -8,6 +8,9 @@ Jwt_Diff: 604800 #60*60*24*7,7天内用户有访问。refresh_token就会刷新�
 Admin:
     Names: ["zxl"]
 
+Pms:
+    Url: "http://localhost:8081/user/name/%s/point/bool/%s"
+
 Ldap:
   Host: 18.18.2.2:389
   BaseDN: dc=example,dc=org
