@@ -23,7 +23,7 @@ func Refresh_Token(c *gin.Context) {
 	authtoken, _ := tokeni.(string)
 
 	claims, _ := useri.(*jwt.Claims)
-	token, refresh := jwt.CreateToken(claims.Uid, claims.User, claims.CN, claims.Mail)
+	token, refresh := jwt.CreateToken(claims.Uid, claims.CN, claims.SN, claims.Mail)
 
 	status := false
 
@@ -70,6 +70,7 @@ func Login(c *gin.Context) {
 		cn, _ := m["cn"].(string)
 		mail, _ := m["mail"].(string)
 		uidstr, _ := m["uid"].(string)
+
 		uid, err := strconv.ParseInt(uidstr, 10, 64)
 
 		//如果存在，判断密码是否正确

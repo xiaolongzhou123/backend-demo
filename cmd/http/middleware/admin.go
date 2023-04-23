@@ -20,11 +20,15 @@ func IsAdmin() func(c *gin.Context) {
 
 		if user, exist := c.Get("user"); exist {
 			u, _ := user.(*jwt.Claims)
-			ok := utils.IsAdmin(u.User)
+
+			iauth, _ := c.Get("Authorization")
+			auth, _ := iauth.(string)
+			ok := utils.IsAdmin(u.CN, auth)
 			if !ok {
-				NotAdmin(u.User+":非管理员", c)
+				NotAdmin(u.CN+":非管理员", c)
 				return
 			}
+
 			c.Next()
 		}
 	}

@@ -9,7 +9,7 @@ import (
 )
 
 type Claims struct {
-	User string `json:"user"`
+	SN   string `json:"sn"`
 	CN   string `json:"cn"`
 	Mail string `json:"mail"`
 	Uid  int64  `json:"uid"`
@@ -17,42 +17,42 @@ type Claims struct {
 	jwt.StandardClaims
 }
 
-func NewClaims(uid, index int64, user, cn, mail string) *Claims {
+func NewClaims(uid, index int64, sn, cn, mail string) *Claims {
 	conf := pkg.Conf()
 	t := time.Now()
 	if index == 1 {
 		return &Claims{
 			Uid:  uid,
-			User: user,
+			SN:   sn,
 			CN:   cn,
 			Mail: mail,
 			Type: true,
 			StandardClaims: jwt.StandardClaims{
 				ExpiresAt: t.Add(time.Duration(conf.JwtExp) * time.Minute).Unix(),
-				Issuer:    user,
+				Issuer:    cn,
 				IssuedAt:  time.Now().Unix(),
 			},
 		}
 	}
 	return &Claims{
 		Uid:  uid,
-		User: user,
+		SN:   sn,
 		CN:   cn,
 		Mail: mail,
 		Type: false,
 		StandardClaims: jwt.StandardClaims{
 			ExpiresAt: t.Add(time.Duration(conf.JwtRef) * time.Minute).Unix(),
-			Issuer:    user,
+			Issuer:    cn,
 			IssuedAt:  time.Now().Unix(),
 		},
 	}
 }
 
 //同时返回access_token和refresh_token
-func CreateToken(uid int64, user, CN, Mail string) (string, string) {
+func CreateToken(uid int64, CN, SN, Mail string) (string, string) {
 	conf := pkg.Conf()
-	claims_accces := NewClaims(uid, 1, user, CN, Mail)
-	claims_refresh := NewClaims(uid, 2, user, CN, Mail)
+	claims_accces := NewClaims(uid, 1, CN, SN, Mail)
+	claims_refresh := NewClaims(uid, 2, CN, SN, Mail)
 	access := jwt.NewWithClaims(jwt.SigningMethodHS256, claims_accces)
 	refresh := jwt.NewWithClaims(jwt.SigningMethodHS256, claims_refresh)
 	str1, _ := access.SignedString([]byte(conf.JwtSecret))

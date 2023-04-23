@@ -11,6 +11,28 @@ import (
 	"github.com/gin-gonic/gin/binding"
 )
 
+func GetLdapUser(c *gin.Context) {
+	code := 200
+	mess := "ok"
+	u, _ := c.Get("user")
+	user, _ := u.(*jwt.Claims)
+
+	conn, err := ldap.NewLDAP()
+	if err != nil {
+		c.JSON(200, typing.NewResp(401, "ldap无法连接", err.Error()))
+		return
+	}
+	defer conn.Close()
+	//判断用户是否存在,即查询用户dn
+	m, err := conn.GetUserValue(user.CN)
+	if err != nil {
+		c.JSON(200, typing.NewResp(401, "ldap无法连接", err.Error()))
+		return
+	}
+
+	rs := typing.NewResp(code, mess, m)
+	c.JSON(code, rs)
+}
 func GetUser(c *gin.Context) {
 	code := 200
 	mess := "ok"
@@ -36,7 +58,7 @@ func ChangePasswd(c *gin.Context) {
 		user, _ := c.Get("user")
 		u, _ := user.(*jwt.Claims)
 
-		if u.User != b.User {
+		if u.CN != b.User {
 			c.JSON(200, typing.NewResp(10011, "会话用户和提交用户不匹配", struct{}{}))
 			return
 		}
@@ -59,7 +81,7 @@ func ChangePasswd(c *gin.Context) {
 		//修改密码
 		if err = conn.ChangePasswd(userdn, b.OldPass, b.CurPass); err != nil {
 			fmt.Println(err)
-			c.JSON(200, typing.NewResp(10003, "密码修改失败", err.Error()))
+			c.JSON(200, typing.NewResp(10003, err.Error(), struct{}{}))
 		} else {
 			c.JSON(200, typing.NewResp(200, "密码修改成功", struct{}{}))
 		}

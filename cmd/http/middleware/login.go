@@ -1,6 +1,7 @@
 package middleware
 
 import (
+	"fmt"
 	"sso/pkg/jwt"
 	"sso/pkg/typing"
 	"strings"
@@ -36,6 +37,7 @@ func IsRefresh() func(c *gin.Context) {
 			UnLogin(err.Error(), c)
 			return
 		}
+		fmt.Println("ls_refresh==claims:", claims)
 		if claims.Type {
 			UnLogin("can't use access token as refresh token", c)
 			return
@@ -68,12 +70,14 @@ func IsLogin() func(c *gin.Context) {
 			UnLogin(err.Error(), c)
 			return
 		}
+		fmt.Println("login==claims:", claims)
 		if !claims.Type {
 			UnLogin("can't use refresh token", c)
 			return
 		}
 		// 保存当前登录的用户信息，存入context 上下文当中去，并继续向下执行
 		c.Set("user", claims)
+		c.Set("Authorization", authStr)
 		c.Next()
 	}
 }
