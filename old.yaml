@@ -1,0 +1,73 @@
+Port: 18080
+Debug: true
+Jwt_Exp: 60    #,签发超时时间，分为单位
+Jwt_Ref: 43200  #,签发超时时间，分为单位
+Jwt_Secret: "this1is2secret"
+Jwt_Diff: 604800 #60*60*24*7,7天内用户有访问。refresh_token就会刷新，保证用户token可用
+
+Admin:
+   Names: ["zxl"]
+
+Pms:
+   Enable: false
+   Url: "http://localhost:8081/user/name/%s/point/bool/%s"
+
+Nav:
+  Items:
+   - Name: "AR651F"
+     Value: "18.18.1.1"
+     Config:
+      User: "admin"
+      Pass: "Nicholas@123"
+      Bs: true  #控制字符为backspace del=127，硬件等ssh，回车是8 ctrl+h
+      Port: 51985
+   - Name: "S9700S-S"
+     Value: "18.18.2.3"
+     Config:
+      User: "admin"
+      Pass: "Nicholas@123"
+      Bs: true  #控制字符为backspace del=127，硬件等ssh，回车是8 ctrl+h
+      Port: 22
+   - Name: "switch-pwr"
+     Value: "18.18.2.4"
+     Config:
+      User: "admin"
+      Pass: "Nicholas@123"
+      Bs: true  #控制字符为backspace del=127，硬件等ssh，回车是8 ctrl+h
+      Port: 22
+
+Promethues:
+  Timeout: "5s"  #向promethues发送请求，5s超时
+  QueryRange: "http://18.18.2.2:9090/api/v1/query_range"
+  Query: "http://18.18.2.2:9090/api/v1/query"
+
+Screen:
+  AllOut: "irate(ifOutOctets{job='AR',ifName='GigabitEthernet0/0/6'}[2m])"
+  AllIn:  "irate(ifInOctets{job='AR',ifName='GigabitEthernet0/0/6'}[2m])"
+  WeekFlow: "increase(ifInOctets{instance='18.18.1.1',ifName='GigabitEthernet0/0/6'}[24h])[7d:1d]" #返回一周的流量,全屏，柱状图
+  Full:
+     CPU: "100>hwEntityCpuUsage{instance='18.18.1.1'}>0" #2
+     MEM: "100>hwEntityMemUsage{instance='18.18.1.1'}>0" #2
+     Temperture: "100>hwEntityTemperature{instance='18.18.1.1'}>0" #2
+  YesToday:
+     AllOut: "irate(ifInOctets{instance='18.18.1.1',ifName='GigabitEthernet0/0/6'}[5m])" #1
+     AllIn: "irate(ifInOctets{instance='18.18.1.1',ifName='GigabitEthernet0/0/6'}[5m])" #2
+     All: "max(irate(ifInOctets{instance='18.18.1.1',ifName='GigabitEthernet0/0/6'}[5m])+irate(ifOutOctets{instance='18.18.1.1',ifName='GigabitEthernet0/0/6'}[5m]))" #3
+
+ES:
+  Addrs: ["http://11.11.15.8:9200"]
+  IndexName: "elastiflow-*"
+
+AES:
+  KEY: "KHGSI69YBWGS0TWX"
+  IV: "1234567890654321"
+
+Ldap:
+  DefaultPass: "Xxxxx.ai@123"
+  Host: 18.18.2.2:389
+  BaseDN: dc=example,dc=org
+  BindDN: cn=admin,dc=example,dc=org
+  BinPass: admin
+  LdapAttr: [ 'myId','cn','sn','myLeader',"myGoogle","myDep","myContactReg","myCompanyGroup","myPostion","myReg","myPhone","myTel","myEmail","myName"]  #ldap中有多个字段，只返回这几个字段回来，字段添加越多，返回越多
+  UserDN:
+    signup: ou=tech

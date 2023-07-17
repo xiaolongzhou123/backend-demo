@@ -2,80 +2,82 @@ package pkg
 
 import (
 	"encoding/json"
-
-	"github.com/sirupsen/logrus"
 )
 
 type IConfig struct {
-	IP   string `json:"ip"`
-	User string `yaml:"User"`
-	Pass string `yaml:"Pass"`
-	Bs   bool   `yaml:"Bs"`
-	Port int    `yaml:"Port"`
+	IP   string `json:"ip,omitempty"`
+	User string `json:"user"`
+	Pass string `json:"pass"`
+	Bs   bool   `json:"bs"`
+	Port int    `json:"port"`
 }
 
 type Config struct {
-	logger    *logrus.Logger
-	LogFormat string
-	LogLevel  string
-	Admin     struct {
-		Names []string `yaml:"Names"`
-	}
-	Pms struct {
-		Url    string `yaml:"url"`
-		Enable bool   `yaml:"Enable"`
-	}
+	Admins []string `json:"names"`
+	Pms    struct {
+		Url    string `json:"url"`
+		Enable bool   `json:"enable"`
+	} `json:"pms"`
 	AES struct {
-		KEY string `yaml:"KEY" json:"KEY"`
-		IV  string `yaml:"IV" json:"IV"`
-	} `yaml:"AES"`
+		KEY string `json:"key"`
+		IV  string `json:"iv"`
+	} `json:"aes"`
 	Es struct {
-		IndexName string   `yaml:"indexName"`
-		Addrs     []string `yaml:"Addrs"`
-	} `yaml:"ES"`
+		IndexName string   `json:"indexname"`
+		Addrs     []string `json:"addrs"`
+	} `json:"es"`
 	Nav struct {
 		Items []struct {
-			Name   string  `yaml:"Name" json:"name"`
-			Value  string  `yaml:"Value" json:"value" `
-			Id     int     ` json:"id" `
-			Config IConfig `yaml:"Config"`
-		} `yaml:"Item" json:"item"`
-	} `yaml:"Nav"`
+			Name   string  `json:"name"`
+			Value  string  `json:"value"`
+			Id     string  `json:"id"`
+			Config IConfig `json:"config"`
+		} `json:"item"`
+	} `json:"nav"`
 	Promethues struct {
-		Timeout    string `yaml:"Timeout"`
-		AllOut     string `yaml:"AllOut"`
-		AllIn      string `yaml:"AllIn"`
-		All        string `yaml:"All"`
-		QueryRange string `yaml:"QueryRange"`
-		Query      string `yaml:"Query"`
-		WeekFlow   string `yaml:"WeekFlow"`
-		YesToday   struct {
-			AllOut string `yaml:"AllOut"`
-			AllIn  string `yaml:"AllIn"`
-			All    string `yaml:"All"`
-		} `yaml:"YesToday"`
+		Timeout    string `json:"timeout"`
+		QueryRange string `json:"queryrange"`
+		Query      string `json:"query"`
+	} `json:"promethues"`
+	Screen struct {
+		AllOut   string `json:"allout"`
+		AllIn    string `json:"allin"`
+		WeekFlow string `json:"weekflow"`
+		YesToday struct {
+			AllOut string `json:"allout"`
+			AllIn  string `json:"allin"`
+			All    string `json:"all"`
+		} `json:"yestoday"`
 		Full struct {
-			CPU        string `yaml:"CPU"`
-			MEM        string `yaml:"MEM"`
-			Temperture string `yaml:"Temperture"`
-		} `yaml:"Full"`
-	}
+			CPU        string `json:"cpu"`
+			MEM        string `json:"mem"`
+			Temperture string `json:"temperture"`
+		} `json:"full"`
+	} `json:"screen"`
 	Ldap struct {
-		DefaultPass string            `yaml:"DefaultPass"`
-		Host        string            `yaml:"Host"`
-		BaseDN      string            `yaml:"BaseDN"`
-		BindDN      string            `yaml:"BindDN"`
-		BinPass     string            `yaml:"BinPass"`
-		LdapAttr    []string          `yaml:"LdapAttr"`
-		UserDN      map[string]string `yaml:"UserDN"`
-	} `yaml:"ldap"`
+		BaseDN   string `json:"basedn"`
+		BindPass string `json:"bind_pass"`
+		BindDN   string `json:"binddn"`
 
-	Debug     bool   `mapstructure:"Debug" `
-	Port      int64  `mapstructure:"Port"`
-	JwtExp    int64  `mapstructure:"Jwt_Exp"`
-	JwtRef    int64  `mapstructure:"Jwt_Ref"`
-	JwtDiff   int64  `mapstructure:"Jwt_Diff"`
-	JwtSecret string `mapstructure:"Jwt_Secret"`
+		DefaultPass string            `json:"defaultpass" `
+		Host        string            `json:"host"`
+		LdapAttr    []string          `json:"ldapattr" `
+		UserDN      map[string]string `json:"userdn"`
+	} `json:"ldap"`
+
+	Debug bool  `json:"debug" `
+	Port  int64 `json:"port"`
+	Jwt   struct {
+		Exp    int64  `json:"exp"`
+		Ref    int64  `json:"ref"`
+		Diff   int64  `json:"diff"`
+		Secret string `json:"secret"`
+	} `json:"jwt"`
+	Ssh struct {
+		KeyExchanges []string `json:"keyexchange"`
+		Ciphers      []string `json:"ciphers"`
+		Macs         []string `json:"macs"`
+	}
 }
 
 var config = new(Config)

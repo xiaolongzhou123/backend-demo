@@ -26,7 +26,23 @@ var (
 	ctx    context.Context
 )
 
-//会话
+// 流量
+type BytesFlow struct {
+	Aggregations struct {
+		Bytes struct {
+			Value float64 `json:"value"`
+		} `json:"bytes"`
+		DocCount    int    `json:"doc_count"`
+		Key         int64  `json:"key"`
+		KeyAsString string `json:"key_as_string"`
+	} `json:"Aggregations"`
+	Key         int64  `json:"Key"`
+	KeyAsString string `json:"KeyAsString"`
+	KeyNumber   int64  `json:"KeyNumber"`
+	DocCount    int    `json:"DocCount"`
+}
+
+// 会话
 type AgC struct {
 	Aggregations struct {
 		Num1 struct {
@@ -94,6 +110,11 @@ type FlowData struct {
 	Bytes   float64 `json:"bytes"`
 	Count   int64   `json:"count"`
 }
+type FlowBytes struct {
+	Bytes float64 `json:"bytes"`
+	Times int64   `json:"times"`
+	Count int64   `json:"count"`
+}
 
 type FlowDataC struct {
 	Ip       string `json:"ip"`
@@ -156,6 +177,68 @@ func ElasticInit() error {
 	return nil
 }
 
+func QueryGraph(start, end, index int64) ([][]int64, error) {
+	//arr := make([]*FlowData, 0)
+	arr := make([][]int64, 0)
+
+	ctx = context.Background()
+
+	// g1 := elastic.NewTermsAggregation().Field("network.bytes").OrderByCountDesc().Size(499) //g4
+
+	str1 := time.Unix(int64(start), 0).UTC().Format("2006-01-02T15:04:05Z")
+	str2 := time.Unix(int64(end), 0).UTC().Format("2006-01-02T15:04:05Z")
+
+	timeQuery := elastic.NewRangeQuery("@timestamp").
+		//              转es的时间
+		//      t := time.Now().UTC().Format("2006-01-02T15:04:05Z")
+		Gte(str1).
+		Lte(str2)
+	boolSearch := elastic.NewBoolQuery().Filter(timeQuery)
+	fmt.Println(str1)
+	fmt.Println(str2)
+
+	aggs := elastic.NewDateHistogramAggregation().
+		Field("@timestamp"). // 根据date字段值，对数据进行分组
+		//  分组间隔：month代表每月、支持minute（每分钟）、hour（每小时）、day（每天）、week（每周）、year（每年)
+		CalendarInterval("minute").
+		// 设置返回结果中桶key的时间格式
+		Format("yyyy-MM-dd")
+
+	nb := elastic.NewSumAggregation().Field("network.bytes")
+	aggs.SubAggregation("bytes", nb)
+
+	indexName := pkg.Conf().Es.IndexName
+	res, err = client.Search().Index(indexName).Query(boolSearch).Aggregation("4", aggs).From(0).Pretty(true).Do(ctx) // 执行
+
+	if err != nil {
+		return nil, err
+	}
+	domain, found := res.Aggregations.Terms("4")
+	if !found {
+		fmt.Println("未找到bucket")
+		return nil, err
+	}
+
+	for k, bucket := range domain.Buckets {
+		b, _ := json.Marshal(bucket)
+		log.Printf("====k=%d,v=%s", k, string(b))
+		var d BytesFlow
+		// var d MyData
+		json.Unmarshal(b, &d)
+		//              fmt.Println(d)
+		temp := d.Aggregations
+		t := temp.Key / 1000
+		obj := []int64{t, int64(temp.Bytes.Value)}
+		arr = append(arr, obj)
+
+		fmt.Printf("times=%d,bytes=%v,count=%d\n", t, temp.Bytes.Value, int(temp.DocCount))
+	}
+
+	total := res.TotalHits()
+	fmt.Printf("Found %d results\n", total)
+	return arr, nil
+	//return nil, nil
+}
 func QueryConversation(start, end, index int64) ([]*FlowDataC, error) {
 	fmt.Println("=QueryConversation")
 	arr := make([]*FlowDataC, 0)

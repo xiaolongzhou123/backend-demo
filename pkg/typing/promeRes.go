@@ -39,6 +39,7 @@ type QueryBytes struct {
 	Start int64 `json:"start"`
 	End   int64 `json:"end"`
 	Index int   `json:"index"`
+	Step  int   `json:"step"`
 }
 
 type QueryParam struct {

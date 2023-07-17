@@ -6,6 +6,7 @@ import (
 	"sso/cmd/http"
 	"sso/pkg"
 
+	"github.com/fsnotify/fsnotify"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
@@ -78,12 +79,24 @@ func initConfig() {
 
 		if err := viper.Unmarshal(c); err != nil {
 		}
+
+		viper.OnConfigChange(func(e fsnotify.Event) {
+			fmt.Println("Config file changed:", e.Name)
+			viper.ReadInConfig() // Find and read the config file
+			viper.Unmarshal(c)
+			//      err := viper.Unmarshal(conf)
+			//fmt.Println("===err:", err)
+		})
+		viper.WatchConfig()
 	}
 
 	fmt.Println("==initConfig:config:=", c.String())
-	viper.AutomaticEnv()
+	//viper.AutomaticEnv()
 
-	if err := viper.ReadInConfig(); err == nil {
-		fmt.Println("Using config file:", viper.ConfigFileUsed())
-	}
+	// if err := viper.ReadInConfig(); err == nil {
+	// 	fmt.Println("Using config file:", viper.ConfigFileUsed())
+	// }
+}
+func SyncFile() {
+	viper.WriteConfig()
 }

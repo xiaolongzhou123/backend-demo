@@ -30,14 +30,14 @@ func Refresh_Token(c *gin.Context) {
 	tm1 := time.Unix(claims.ExpiresAt, 0)
 	tm2 := time.Now()
 	//是tm1减tm2，因为tm1是签发过期时间，一般根据配置为配置15天
-	if tm1.Unix()-tm2.Unix() < conf.JwtDiff {
+	if tm1.Unix()-tm2.Unix() < conf.Jwt.Diff {
 		status = true
 	}
 	fmt.Println("status:=", status)
 	fmt.Println("claims.ExpiresAt:=", tm1.Format("2006-01-02 15:04:05"))
 	fmt.Println("tm2=", tm2.Format("2006-01-02 15:04:05"))
 	fmt.Println("tm2-tm1=", tm1.Unix()-tm2.Unix())
-	fmt.Println("diff=", conf.JwtDiff)
+	fmt.Println("diff=", conf.Jwt.Diff)
 
 	rs := make(map[string]string, 0)
 	rs["access_token"] = fmt.Sprintf("%s %s", "Bearer", token)

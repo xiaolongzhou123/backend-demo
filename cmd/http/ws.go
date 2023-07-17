@@ -19,8 +19,8 @@ import (
 )
 
 var upgrader = websocket.Upgrader{
-	ReadBufferSize:  1024,
-	WriteBufferSize: 1024,
+	ReadBufferSize:  4096,
+	WriteBufferSize: 4096,
 	// 解决跨域问题
 	CheckOrigin: func(r *http.Request) bool {
 		//	fmt.Println("CheckOrigin,header===", r.Header)

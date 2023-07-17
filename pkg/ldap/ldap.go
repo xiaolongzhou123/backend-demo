@@ -9,7 +9,7 @@ import (
 	"sso/pkg/utils"
 	"strings"
 
-	"github.com/go-ldap/ldap"
+	"github.com/go-ldap/ldap/v3"
 )
 
 type LdapClient struct {
@@ -27,7 +27,7 @@ func NewLDAP() (*LdapClient, error) {
 		fmt.Println("ldap Dial err:=", err)
 		return nil, err
 	}
-	err = l.Bind(conf.Ldap.BindDN, conf.Ldap.BinPass)
+	err = l.Bind(conf.Ldap.BindDN, conf.Ldap.BindPass)
 	if err != nil {
 		fmt.Println("ldap Bind err:=", err)
 		return nil, err

@@ -28,7 +28,7 @@ func NewClaims(uid, index int64, sn, cn, mail string) *Claims {
 			Mail: mail,
 			Type: true,
 			StandardClaims: jwt.StandardClaims{
-				ExpiresAt: t.Add(time.Duration(conf.JwtExp) * time.Minute).Unix(),
+				ExpiresAt: t.Add(time.Duration(conf.Jwt.Exp) * time.Minute).Unix(),
 				Issuer:    cn,
 				IssuedAt:  time.Now().Unix(),
 			},
@@ -41,22 +41,22 @@ func NewClaims(uid, index int64, sn, cn, mail string) *Claims {
 		Mail: mail,
 		Type: false,
 		StandardClaims: jwt.StandardClaims{
-			ExpiresAt: t.Add(time.Duration(conf.JwtRef) * time.Minute).Unix(),
+			ExpiresAt: t.Add(time.Duration(conf.Jwt.Ref) * time.Minute).Unix(),
 			Issuer:    cn,
 			IssuedAt:  time.Now().Unix(),
 		},
 	}
 }
 
-//同时返回access_token和refresh_token
+// 同时返回access_token和refresh_token
 func CreateToken(uid int64, CN, SN, Mail string) (string, string) {
 	conf := pkg.Conf()
 	claims_accces := NewClaims(uid, 1, CN, SN, Mail)
 	claims_refresh := NewClaims(uid, 2, CN, SN, Mail)
 	access := jwt.NewWithClaims(jwt.SigningMethodHS256, claims_accces)
 	refresh := jwt.NewWithClaims(jwt.SigningMethodHS256, claims_refresh)
-	str1, _ := access.SignedString([]byte(conf.JwtSecret))
-	str2, _ := refresh.SignedString([]byte(conf.JwtSecret))
+	str1, _ := access.SignedString([]byte(conf.Jwt.Secret))
+	str2, _ := refresh.SignedString([]byte(conf.Jwt.Secret))
 	return str1, str2
 }
 func ParseToken(tokenString string) (*Claims, error) {
@@ -64,7 +64,7 @@ func ParseToken(tokenString string) (*Claims, error) {
 	// 调用解析函数
 	token, err := jwt.ParseWithClaims(tokenString, &Claims{}, func(token *jwt.Token) (interface{}, error) {
 		// 只返回加密的秘钥
-		return []byte(conf.JwtSecret), nil
+		return []byte(conf.Jwt.Secret), nil
 	})
 	if err != nil {
 		return nil, err

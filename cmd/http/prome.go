@@ -14,14 +14,14 @@ import (
 	"github.com/gin-gonic/gin/binding"
 )
 
-//range接口
+// range接口
 func QueryWeekFlow(c *gin.Context) {
 	code := 200
 	mess := "ok"
 
 	conf := pkg.Conf()
 	url := conf.Promethues.Query
-	query := conf.Promethues.WeekFlow
+	query := conf.Screen.WeekFlow
 
 	rs, err := utils.Query(url, query) //url中，已经有"%s了。"
 	if err != nil {
@@ -60,14 +60,26 @@ func QueryES(c *gin.Context) {
 			return
 		}
 		c.JSON(200, typing.NewResp(200, "ok", rs1))
-	} else {
+	} else if b.Index == 3 {
 
-		rs1, err := es.Query1(b.Start, b.End, b.Index)
+		rs1, err := es.QueryConversation(b.Start, b.End, b.Index)
 		if err != nil {
 			c.JSON(200, typing.NewResp(10002, err.Error(), struct{}{}))
 			return
 		}
 		c.JSON(200, typing.NewResp(200, "ok", rs1))
+
+	} else if b.Index == 4 {
+		//这里是流量
+		rs1, err := es.QueryGraph(b.Start, b.End, b.Index)
+		if err != nil {
+			c.JSON(200, typing.NewResp(10002, err.Error(), struct{}{}))
+			return
+		}
+		c.JSON(200, typing.NewResp(200, "ok", rs1))
+	} else {
+		c.JSON(200, typing.NewResp(10002, "index", struct{}{}))
+		return
 	}
 
 }
@@ -92,13 +104,13 @@ func QueryToDayAndYesToday(c *gin.Context) {
 
 	Step := utils.FindIndex(diff)
 
-	query := conf.Promethues.Full.CPU
+	query := conf.Screen.Full.CPU
 
 	step := fmt.Sprintf("%d", Step)
 	if b.Index == 2 {
-		query = conf.Promethues.Full.MEM
+		query = conf.Screen.Full.MEM
 	} else if b.Index == 3 {
-		query = conf.Promethues.Full.Temperture
+		query = conf.Screen.Full.Temperture
 	}
 
 	fmt.Println("|||==========", query, start, end, (b.End - b.Start), step)
@@ -150,17 +162,21 @@ func QueryFullBytes(c *gin.Context) {
 	start := time.Unix(b.Start, 0)
 	end := time.Unix(b.End, 0)
 
-	diff := (b.End - b.Start) / 60 //转分钟
+	//diff := (b.End - b.Start) / 60 //转分钟
+
+	//	Step := utils.FindIndex(diff)
+
+	query := conf.Screen.Full.CPU
+
+	diff := b.End - b.Start
 
 	Step := utils.FindIndex(diff)
-
-	query := conf.Promethues.Full.CPU
-
 	step := fmt.Sprintf("%d", Step)
+
 	if b.Index == 2 {
-		query = conf.Promethues.Full.MEM
+		query = conf.Screen.Full.MEM
 	} else if b.Index == 3 {
-		query = conf.Promethues.Full.Temperture
+		query = conf.Screen.Full.Temperture
 	}
 
 	fmt.Println("|||==========", query, start, end, (b.End - b.Start), step)
@@ -196,13 +212,13 @@ func QueryYesTodayBytes(c *gin.Context) {
 
 	Step := utils.FindIndex(diff)
 
-	query := conf.Promethues.YesToday.All
+	query := conf.Screen.YesToday.All
 
 	step := fmt.Sprintf("%d", Step)
 	if b.Index == 1 {
-		query = conf.Promethues.YesToday.AllOut
+		query = conf.Screen.YesToday.AllOut
 	} else if b.Index == 2 {
-		query = conf.Promethues.YesToday.AllIn
+		query = conf.Screen.YesToday.AllIn
 	}
 
 	fmt.Println("|||==========", "QueryYesTodayBytes index", b.Index, query, start, end, (b.End - b.Start), step)
@@ -271,9 +287,9 @@ func QueryRange(c *gin.Context) {
 	step := fmt.Sprintf("%d", b.Step)
 	query := ""
 	if b.Index == 1 {
-		query = conf.Promethues.AllOut
+		query = conf.Screen.AllOut
 	} else {
-		query = conf.Promethues.AllIn
+		query = conf.Screen.AllIn
 	}
 
 	fmt.Println("====", query, start, end, step)

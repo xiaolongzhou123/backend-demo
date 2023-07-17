@@ -5,7 +5,7 @@ import (
 	"log"
 	"testing"
 
-	"github.com/go-ldap/ldap"
+	"github.com/go-ldap/ldap/v3"
 )
 
 func TestNewLDAP(t *testing.T) {

@@ -8,6 +8,7 @@ import (
 	"io"
 	"net"
 	"os"
+	"sso/pkg"
 	"time"
 
 	"github.com/gorilla/websocket"
@@ -167,6 +168,7 @@ func (c *Cli) Enter() error {
 
 // 连接
 func (c *Cli) connect() error {
+	conf := pkg.Conf()
 	timeout := 5 * time.Second
 	var config ssh.ClientConfig
 	if c.Password != "" {
@@ -190,9 +192,9 @@ func (c *Cli) connect() error {
 			Timeout:         timeout,
 		}
 	}
-	config.KeyExchanges = []string{"diffie-hellman-group1-sha1", "diffie-hellman-group14-sha1", "diffie-hellman-group-exchange-sha1", "diffie-hellman-group-exchange-sha256"}
-	config.Ciphers = []string{"aes128-cbc", "3des-cbc", "des-cbc", "aes256-ctr", "aes192-ctr", "aes128-ctr"}
-	config.MACs = []string{"hmac-sha1", "hmac-sha2-256"}
+	config.KeyExchanges = conf.Ssh.KeyExchanges
+	config.Ciphers = conf.Ssh.Ciphers
+	config.MACs = conf.Ssh.Macs
 
 	addr := fmt.Sprintf("%s:%d", c.IP, c.Port)
 	sshClient, err := ssh.Dial("tcp", addr, &config)
@@ -327,7 +329,7 @@ func (c *Cli) Send(wsConn *websocket.Conn, exitCh chan bool) {
 	}()
 
 	//every 120ms write combine output bytes into websocket response
-	tick := time.NewTicker(time.Millisecond * time.Duration(12))
+	tick := time.NewTicker(time.Second * time.Duration(3))
 	// send ping message
 	pingTick := time.NewTimer(interval)
 	//for range time.Tick(120 * time.Millisecond){}
